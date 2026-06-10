@@ -1,0 +1,33 @@
+# ⚠️ Zonas definidas el 09-06-2026. REVISAR tras cada earnings o noticia relevante.
+# No son recomendaciones: son niveles de referencia propios para vigilancia.
+watchlist:
+  ZETA:
+    zona_entrada: [18.5, 19.5]
+    soporte_profundo: [17.8, 18.6]
+    resistencia_clave: 24.90
+    nota_manual: "LITIGIO de valores vivo (Davoodi, SDNY). Cola binaria. TAMAÑO PEQUEÑO."
+    earnings_proximos: "2026-08 (aprox)"
+  MGNI:
+    zona_entrada: [12.5, 13.5]
+    resistencia_clave: 15.50
+    nota_manual: "Entrada alternativa: ruptura confirmada >15.50-16. Legacy en declive vs CTV."
+  AXON:
+    zona_entrada: [400, 420]
+    soporte_profundo: 380
+    nota_manual: "Compounder de calidad: entrada ESCALONADA, no de golpe. Earnings ~11-ago."
+  PGY:
+    zona_entrada: [11.0, 12.5]
+    nota_manual: "Beta 3.5 + riesgo ciclo de crédito. TAMAÑO MÍNIMO aunque toque zona."
+secundarios:
+  HAE: { nota_manual: "Defensiva, crecimiento bajo. Sin zona definida aún." }
+  CPNG: { nota_manual: "Turnaround sin confirmar. Solo vigilar fundamentales." }
+
+umbrales_score:  # ver §5 del SPEC; editable (se completa en Fase 2)
+  crecimiento_verde: 20
+  margen_bruto_verde: 50
+  dilucion_maxima: 5
+
+alertas:
+  hora_cron: "07:30"          # hora local Madrid, tras cierre USA del día anterior
+  proximidad_zona_pct: 3      # avisar también cuando esté a <3% de la zona
+  antispam_dias: 5            # no repetir alerta idéntica en N días
