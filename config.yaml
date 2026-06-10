@@ -6,6 +6,7 @@ watchlist:
     soporte_profundo: [17.8, 18.6]
     resistencia_clave: 24.90
     nota_manual: "LITIGIO de valores vivo (Davoodi, SDNY). Cola binaria. TAMAÑO PEQUEÑO."
+    bandera_manual: "Litigio de valores vivo (Davoodi, SDNY)"
     earnings_proximos: "2026-08 (aprox)"
   MGNI:
     zona_entrada: [12.5, 13.5]
@@ -18,14 +19,38 @@ watchlist:
   PGY:
     zona_entrada: [11.0, 12.5]
     nota_manual: "Beta 3.5 + riesgo ciclo de crédito. TAMAÑO MÍNIMO aunque toque zona."
+    bandera_manual: "Exposición a ciclo de crédito"
 secundarios:
   HAE: { nota_manual: "Defensiva, crecimiento bajo. Sin zona definida aún." }
   CPNG: { nota_manual: "Turnaround sin confirmar. Solo vigilar fundamentales." }
 
-umbrales_score:  # ver §5 del SPEC; editable (se completa en Fase 2)
-  crecimiento_verde: 20
-  margen_bruto_verde: 50
-  dilucion_maxima: 5
+umbrales_score:  # tabla §5 del SPEC: verde = puntos completos, amarillo = mitad
+  crecimiento_verde: 20         # % ingresos YoY
+  crecimiento_amarillo: 10
+  margen_bruto_verde: 50        # %
+  margen_bruto_amarillo: 35
+  margen_fcf_verde: 10          # %
+  margen_fcf_amarillo: 5
+  deuda_ebitda_verde: 1         # x (o caja neta)
+  deuda_ebitda_amarillo: 3
+  roe_verde: 15                 # %
+  roe_amarillo: 8
+  dilucion_verde: 2             # % crecimiento acciones YoY
+  dilucion_amarillo: 5
+  dilucion_maxima: 5            # 🚩 bandera roja si supera
+  caida_margen_bruto_pp: 3      # 🚩 p.p. de caída YoY
+  deuda_ebitda_bandera: 3       # 🚩 x
+  deceleracion_ingresos_pp: 10  # 🚩 p.p. vs año anterior
+
+pesos_score:  # tabla §5; suman 100
+  crecimiento: 20
+  margen_bruto: 10
+  fcf: 20
+  margen_fcf: 10
+  balance: 10
+  roe: 10
+  dilucion: 10
+  beneficio_acompana: 10
 
 alertas:
   hora_cron: "07:30"          # hora local Madrid, tras cierre USA del día anterior

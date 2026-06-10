@@ -1,16 +1,20 @@
-"""Informe diario (versión mínima Fase 1): tabla en consola.
+"""Informe diario: tabla de zonas + sección fundamental.
 
-ticker | cierre | zona | distancia % | RSI(14) | vs SMA50 | vs SMA200 | nota_manual
-
+Tabla: ticker | cierre | zona | distancia % | RSI(14) | vs SMA50 | vs SMA200 | nota_manual
 RSI y SMAs se calculan con pandas sobre los datos guardados en SQLite.
 La distancia es respecto al borde más cercano de la zona de entrada:
 positiva = el precio está por encima de la zona; negativa = por debajo;
 "EN ZONA" si el cierre está dentro.
+
+Sección fundamental: último score guardado por ticker (watchlist + secundarios),
+con desglose, banderas rojas y nota_manual. Análisis, nunca recomendación.
 """
+
+import json
 
 import pandas as pd
 
-from . import db
+from . import analisis, db
 from .ingesta import cargar_config
 
 PERIODO_RSI = 14
@@ -79,6 +83,27 @@ def fila_ticker(con, ticker: str, datos_ticker: dict) -> dict:
     }
 
 
+def seccion_fundamental(con, config: dict) -> None:
+    """Imprime el último score guardado de cada ticker (watchlist + secundarios)."""
+    print()
+    print("SECCIÓN FUNDAMENTAL — score 0-100 (checklist §5; análisis, no recomendación)")
+    print("=" * 78)
+    todos = {**config["watchlist"], **(config.get("secundarios") or {})}
+    for ticker in todos:
+        fila = con.execute(
+            "SELECT fecha, score_total, detalle_json FROM scores "
+            "WHERE ticker = ? ORDER BY fecha DESC LIMIT 1",
+            (ticker,),
+        ).fetchone()
+        if fila is None:
+            print(f"{ticker} — sin score guardado (ejecuta: python -m src.analisis {ticker})")
+        else:
+            fecha, score, detalle_json = fila
+            print(analisis.formatear_score(ticker, score, json.loads(detalle_json)))
+            print(f"  (snapshot {fecha})")
+        print()
+
+
 def main() -> None:
     config = cargar_config()
     con = db.conectar()
@@ -87,9 +112,13 @@ def main() -> None:
             fila_ticker(con, ticker, datos or {})
             for ticker, datos in config["watchlist"].items()
         ]
+        imprimir_tabla(filas)
+        seccion_fundamental(con, config)
     finally:
         con.close()
 
+
+def imprimir_tabla(filas) -> None:
     columnas = [
         ("ticker", "ticker", 6),
         ("cierre", "cierre", 8),
