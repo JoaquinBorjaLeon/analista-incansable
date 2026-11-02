@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block titulo %}{{ f.ticker }}{% endblock %}
+{% block contenido %}
+<p><a href="/" class="volver">Volver a la watchlist</a></p>
+<h1>{{ f.ticker }}</h1>
+
+<section>
+  <h2>Precio y zona</h2>
+  <dl>
+    <dt>Cierre</dt><dd>{{ "%.2f"|format(f.cierre) if f.cierre is not none else "s/d" }}{% if f.fecha %} <small>({{ f.fecha }})</small>{% endif %}</dd>
+    <dt>Zona</dt><dd>{{ f.zona[0] ~ " a " ~ f.zona[1] if f.zona else "sin zona definida" }}</dd>
+    <dt>Distancia</dt><dd class="{{ f.estado }}">{% if f.estado == "en-zona" %}En zona{% elif f.distancia is not none %}{{ "%+.1f"|format(f.distancia) }} %{% else %}s/d{% endif %}</dd>
+    <dt>RSI (14)</dt><dd>{{ f.rsi if f.rsi is not none else "s/d" }}</dd>
+    <dt>Frente a SMA50</dt><dd>{{ f.sma50 }}</dd>
+    <dt>Frente a SMA200</dt><dd>{{ f.sma200 }}</dd>
+  </dl>
+</section>
+
+<section>
+  <h2>Score fundamental: {{ "%g"|format(f.score) ~ "/100" if f.score is not none else "sin calcular" }}</h2>
+  {% if f.desglose %}
+  <table>
+    <thead><tr><th>Criterio</th><th>Valor</th><th>Puntos</th></tr></thead>
+    <tbody>
+    {% for c in f.desglose %}
+      <tr class="{{ c.estado }}"><td>{{ c.criterio }}</td><td>{{ c.valor }}</td><td>{{ "%g"|format(c.puntos) }}/{{ c.max }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  {% if f.banderas %}<ul class="banderas">{% for b in f.banderas %}<li>{{ b }}</li>{% endfor %}</ul>
+  {% elif f.score is not none %}<p>Sin banderas rojas.</p>{% endif %}
+</section>
+
+{% if f.nota %}<section><h2>Nota</h2><p>{{ f.nota }}</p></section>{% endif %}
+
+<section>
+  <h2>Alertas recientes</h2>
+  {% if alertas %}
+  <ul class="alertas">{% for a in alertas %}<li><small>{{ a.fecha }}</small> {{ a.mensaje }}</li>{% endfor %}</ul>
+  {% else %}<p>Ninguna alerta enviada para este ticker.</p>{% endif %}
+</section>
+{% endblock %}

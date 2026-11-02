@@ -15,7 +15,7 @@
 |---|---|
 | Hardware | AMD Ryzen 9 4900H, 32 GB RAM |
 | SO | Ubuntu Server 26.04 LTS |
-| Acceso SSH | `ssh <usuario>@<servidor>` (o IP Tailscale `<ip-privada-del-servidor>`) |
+| Acceso | SSH dentro de la red privada (Tailscale) |
 | Tailscale | ✅ Instalado y operativo |
 | Ollama | ✅ Instalado, modelo Llama 3.1 8B disponible |
 | Open WebUI | ✅ Puerto 3000 |
@@ -28,8 +28,8 @@
 ### Portátil (cliente de desarrollo)
 | Item | Valor |
 |---|---|
-| Equipo | Portátil con GPU |
-| Tailscale | `<ip-privada-del-portatil>` |
+| Equipo | Portátil con GPU dedicada |
+| Red | Misma red privada (Tailscale) que el servidor |
 | Rol | Desarrollo remoto (VS Code Remote-SSH o terminal SSH) + uso diario |
 
 ### Puertos asignados (evitar conflictos)
@@ -42,8 +42,8 @@
 
 ### Dónde se trabaja cada cosa
 - **Todo el código y los servicios se ejecutan en el Mini PC.**
-- **Desarrollo:** desde el portátil con VS Code + extensión Remote-SSH conectado a
-  `<usuario>@<servidor>`, o con Claude Code lanzado en una sesión SSH dentro del Mini PC.
+- **Desarrollo:** desde el portátil con VS Code + extensión Remote-SSH conectado al
+  servidor, o con Claude Code lanzado en una sesión SSH dentro del Mini PC.
 - **Recomendado:** lanzar Claude Code DENTRO del Mini PC (vía SSH) para que cree, ejecute
   y pruebe el código directamente donde va a vivir.
 - **Exploración de datos puntual:** Jupyter Lab ya existente (puerto 8888).
@@ -270,7 +270,7 @@ alertas:
 
 ### FASE 0 — Preparación del entorno (30-45 min) · 📍 Mini PC vía SSH
 
-**Desde dónde:** terminal del portátil → `ssh <usuario>@<servidor>`.
+**Desde dónde:** terminal del portátil, por SSH al servidor.
 
 **Tareas:**
 1. Verificar versiones: `python3 --version` (≥3.10), `git --version`, `docker --version`
@@ -345,7 +345,7 @@ nota del litigio visible.
    docker run -d --name n8n --restart unless-stopped \
      -p 5678:5678 -v ~/.n8n:/home/node/.n8n n8nio/n8n
    ```
-   UI accesible vía Tailscale: `http://<ip-privada-del-servidor>:5678`.
+   UI accesible solo dentro de la red privada: `http://<ip-privada-del-servidor>:5678`.
 3. Bot de Telegram: crear con @BotFather desde el móvil → token al `.env`.
    Obtener `chat_id` (mensaje al bot + endpoint getUpdates).
 
@@ -404,7 +404,7 @@ correctas verificables contra el documento original.
 
 **Nota de rendimiento:** Llama 3.1 8B en CPU (sin GPU en el Mini PC) responde lento
 (decenas de segundos). Aceptable para consultas puntuales. Alternativa: exponer Ollama
-del portátil (con GPU, Tailscale <ip-privada-del-portatil>) y apuntar `consulta.py` allí
+del portátil con GPU (dentro de la red privada) y apuntar `consulta.py` allí
 cuando el portátil esté encendido — dejarlo como parámetro en config.
 
 ---

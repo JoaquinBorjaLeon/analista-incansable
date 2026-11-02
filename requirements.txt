@@ -2,3 +2,6 @@ yfinance
 pandas
 pyyaml
 python-dotenv
+fastapi
+uvicorn
+jinja2

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>Watchlist</h1>
+<p class="sub">Ordenada por distancia a la zona de entrada.</p>
+<ul class="lista">
+{% for f in filas %}
+  <li class="fila {{ f.estado }}">
+    <a href="/ticker/{{ f.ticker }}">
+      <span class="tk">{{ f.ticker }}</span>
+      <span class="precio">{{ "%.2f"|format(f.cierre) if f.cierre is not none else "s/d" }}</span>
+      <span class="dist">
+        {% if f.estado == "en-zona" %}En zona
+        {% elif f.distancia is not none %}{{ "%+.1f"|format(f.distancia) }} %
+        {% else %}{{ "sin zona" if f.estado == "sin-zona" else "sin datos" }}{% endif %}
+      </span>
+      <span class="score">{{ "%g"|format(f.score) ~ "/100" if f.score is not none else "s/d" }}</span>
+      {% if f.banderas %}<span class="flags">{{ f.banderas|length }} 🚩</span>{% endif %}
+      {% if f.fecha %}<span class="fecha">Dato del {{ f.fecha }}</span>{% endif %}
+    </a>
+  </li>
+{% else %}
+  <li class="vacio">La watchlist de config.yaml está vacía.</li>
+{% endfor %}
+</ul>
+{% if secundarios %}
+<h2>Solo fundamentales</h2>
+<ul class="lista">
+{% for f in secundarios %}
+  <li class="fila sin-zona"><a href="/ticker/{{ f.ticker }}"><span class="tk">{{ f.ticker }}</span>
+  <span class="score">{{ "%g"|format(f.score) ~ "/100" if f.score is not none else "s/d" }}</span>
+  {% if f.banderas %}<span class="flags">{{ f.banderas|length }} 🚩</span>{% endif %}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

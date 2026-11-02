@@ -117,7 +117,7 @@ tesis ni zonas (eso se hace en config.yaml versionado en git).
 
 ### Puerto y servicio
 - Puerto **8080** (libre según §0 del SPEC; no tocar 3000/5678/6333/8888).
-- Servicio systemd `panel-inversiones.service` (usuario <usuario>, WorkingDirectory
+- Servicio systemd `panel-inversiones.service` (usuario del servidor, WorkingDirectory
   el proyecto, ExecStart con uvicorn, Restart=always) para que sobreviva reinicios.
 - Escuchar en `0.0.0.0:8080` — queda protegido porque la red solo es alcanzable
   dentro de la tailnet. NO configurar port-forwarding en el router ni túneles públicos.

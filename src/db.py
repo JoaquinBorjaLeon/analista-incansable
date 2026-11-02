@@ -1,11 +1,17 @@
-"""Esquema y helpers de SQLite (Fase 2: tablas `precios`, `fundamentales` y `scores`)."""
+"""Esquema y helpers de SQLite.
 
+Tablas: `precios` (Fase 1), `fundamentales` y `scores` (Fase 2) y
+`alertas_enviadas` (Fase 3, anti-spam de alertas).
+"""
+
+import os
 import sqlite3
 from pathlib import Path
 
 RAIZ_PROYECTO = Path(__file__).resolve().parent.parent
-RUTA_DB = RAIZ_PROYECTO / "datos.db"
-RUTA_CONFIG = RAIZ_PROYECTO / "config.yaml"
+# Rutas por defecto; se pueden cambiar con variables de entorno (p. ej. para la demo)
+RUTA_DB = Path(os.getenv("ANALISTA_DB", RAIZ_PROYECTO / "datos.db"))
+RUTA_CONFIG = Path(os.getenv("ANALISTA_CONFIG", RAIZ_PROYECTO / "config.yaml"))
 
 ESQUEMA = """
 CREATE TABLE IF NOT EXISTS precios (
@@ -44,6 +50,15 @@ CREATE TABLE IF NOT EXISTS scores (
     score_total REAL,             -- 0-100
     detalle_json TEXT,            -- desglose por criterio + banderas rojas
     PRIMARY KEY (ticker, fecha)
+);
+
+-- Alertas enviadas (anti-spam: no repetir la misma alerta cada día)
+CREATE TABLE IF NOT EXISTS alertas_enviadas (
+    ticker TEXT NOT NULL,
+    tipo TEXT NOT NULL,           -- 'entrada_zona' | 'proximidad' | 'cruce_media' | 'bandera_roja_nueva'
+    fecha DATE NOT NULL,
+    payload TEXT,
+    PRIMARY KEY (ticker, tipo, fecha)
 );
 """
 
@@ -98,3 +113,28 @@ def upsert_score(con: sqlite3.Connection, ticker: str, fecha: str, score_total: 
         (ticker, fecha, score_total, detalle_json),
     )
     con.commit()
+
+
+def alerta_reciente(con: sqlite3.Connection, ticker: str, tipo: str, desde: str) -> bool:
+    """True si ya se envió una alerta (ticker, tipo) con fecha >= `desde` (YYYY-MM-DD)."""
+    fila = con.execute(
+        "SELECT 1 FROM alertas_enviadas WHERE ticker = ? AND tipo = ? AND fecha >= ? LIMIT 1",
+        (ticker, tipo, desde),
+    ).fetchone()
+    return fila is not None
+
+
+def registrar_alerta(con: sqlite3.Connection, ticker: str, tipo: str, fecha: str, payload: str) -> None:
+    con.execute(
+        "INSERT OR REPLACE INTO alertas_enviadas (ticker, tipo, fecha, payload) VALUES (?, ?, ?, ?)",
+        (ticker, tipo, fecha, payload),
+    )
+    con.commit()
+
+
+def ultimos_scores(con: sqlite3.Connection, ticker: str, n: int = 2):
+    """Los n scores más recientes de un ticker: [(fecha, score_total, detalle_json), ...]."""
+    return con.execute(
+        "SELECT fecha, score_total, detalle_json FROM scores WHERE ticker = ? ORDER BY fecha DESC LIMIT ?",
+        (ticker, n),
+    ).fetchall()
