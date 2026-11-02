@@ -168,7 +168,7 @@ def calcular_score(metricas: dict, config: dict, bandera_manual: str | None = No
 
 def formatear_score(ticker: str, score_total: float, detalle: dict) -> str:
     """Score + desglose + banderas + nota_manual. Nunca un 'comprar/vender'."""
-    lineas = [f"{ticker} — Score {score_total:g}/100"]
+    lineas = [f"{ticker} · Score {score_total:g}/100"]
     for c in detalle["desglose"]:
         icono = ICONOS.get(c["estado"], "⚪")
         lineas.append(f"  {icono} {c['criterio']:<26} {c['valor']:<34} {c['puntos']:g}/{c['max']}")

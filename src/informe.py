@@ -60,8 +60,8 @@ def fila_ticker(con, ticker: str, datos_ticker: dict) -> dict:
     )["close"]
     if serie.empty:
         return {
-            "ticker": ticker, "cierre": "s/d", "zona": "—", "distancia": "—",
-            "rsi": "—", "sma50": "—", "sma200": "—",
+            "ticker": ticker, "cierre": "s/d", "zona": "s/d", "distancia": "s/d",
+            "rsi": "s/d", "sma50": "s/d", "sma200": "s/d",
             "nota": datos_ticker.get("nota_manual", ""),
         }
 
@@ -74,8 +74,8 @@ def fila_ticker(con, ticker: str, datos_ticker: dict) -> dict:
     return {
         "ticker": ticker,
         "cierre": f"{cierre:.2f}",
-        "zona": f"{zona[0]}-{zona[1]}" if zona else "—",
-        "distancia": distancia_a_zona(cierre, zona) if zona else "—",
+        "zona": f"{zona[0]}-{zona[1]}" if zona else "s/d",
+        "distancia": distancia_a_zona(cierre, zona) if zona else "s/d",
         "rsi": f"{valor_rsi:.1f}" if not pd.isna(valor_rsi) else "s/d",
         "sma50": vs_media(cierre, sma50),
         "sma200": vs_media(cierre, sma200),
@@ -86,7 +86,7 @@ def fila_ticker(con, ticker: str, datos_ticker: dict) -> dict:
 def seccion_fundamental(con, config: dict) -> None:
     """Imprime el último score guardado de cada ticker (watchlist + secundarios)."""
     print()
-    print("SECCIÓN FUNDAMENTAL — score 0-100 (checklist §5; análisis, no recomendación)")
+    print("SECCIÓN FUNDAMENTAL: score 0-100 (checklist §5; análisis, no recomendación)")
     print("=" * 78)
     todos = {**config["watchlist"], **(config.get("secundarios") or {})}
     for ticker in todos:
@@ -96,7 +96,7 @@ def seccion_fundamental(con, config: dict) -> None:
             (ticker,),
         ).fetchone()
         if fila is None:
-            print(f"{ticker} — sin score guardado (ejecuta: python -m src.analisis {ticker})")
+            print(f"{ticker}: sin score guardado (ejecuta: python -m src.analisis {ticker})")
         else:
             fecha, score, detalle_json = fila
             print(analisis.formatear_score(ticker, score, json.loads(detalle_json)))
